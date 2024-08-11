@@ -1,0 +1,40 @@
+{
+  "name": "udacity-project-1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "set NODE_OPTIONS=-r ts-node/register&& jasmine",
+    "build": "tsc && copyfiles -u 1 src/images/**/* build/",
+    "start": "node build/index.js",
+    "dev": "ts-node-dev src/index.ts"
+  },
+  "author": "khaihc",
+  "license": "ISC",
+  "description": "Udacity Project 1",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jasmine": "^5.1.4",
+    "@types/node": "^20.14.15",
+    "@types/supertest": "^2.0.16",
+    "copyfiles": "^2.4.1",
+    "cross-env": "^7.0.3",
+    "express": "^4.19.2",
+    "jasmine": "^5.2.0",
+    "jasmine-ts": "^0.4.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.2.4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@babel/preset-typescript": "^7.23.2",
+    "@types/body-parser": "^1.19.4",
+    "@types/cors": "^2.8.15",
+    "@types/sharp": "^0.32.0",
+    "axios": "^1.7.3",
+    "cors": "^2.8.5",
+    "jasmine-spec-reporter": "^7.0.0"
+  }
+}
