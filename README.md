@@ -36,7 +36,7 @@ Prerequisites
 
 Installation
     1. Clone the repo
-        git clone https://.....
+        git clone https://github.com/khaihc/Full-Stack-JavaScript-Developer-project1.git
 
     2. Install NPM packages
         npm install
