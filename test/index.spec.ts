@@ -1,44 +1,71 @@
+import supertest from 'supertest';
+import { Response } from 'superagent';
+const app = require('../src/index.ts');
 import ImageCheckerMiddleware from '../src/middleware/image.middleware';
 
 
 describe('ImageMiddleware', () => {
-    let imageMiddleware: ImageCheckerMiddleware;
+  let imageMiddleware: ImageCheckerMiddleware;
 
-    beforeEach(() => {
-      imageMiddleware = new ImageCheckerMiddleware();
+  beforeEach(() => {
+    imageMiddleware = new ImageCheckerMiddleware();
+  });
+
+  describe('getFileExtension', () => {
+    it('should return the correct file extension', () => {
+      expect(imageMiddleware['getFileExtension']('test.png')).toBe('.png');
+      expect(imageMiddleware['getFileExtension']('test.jpeg')).toBe('.jpeg');
+      expect(imageMiddleware['getFileExtension']('test.jpg')).toBe('.jpg');
+      expect(imageMiddleware['getFileExtension']('test')).toBe('');
+    });
+  });
+
+  describe('isImageValid', () => {
+    it('should return true for valid image extensions', async () => {
+      await expectAsync(imageMiddleware.isImageValid('image.png')).toBeResolvedTo(true);
+      await expectAsync(imageMiddleware.isImageValid('image.jpeg')).toBeResolvedTo(true);
+      await expectAsync(imageMiddleware.isImageValid('image.jpg')).toBeResolvedTo(true);
     });
 
-    describe('getFileExtension', () => {
-      it('should return the correct file extension', () => {
-        expect(imageMiddleware['getFileExtension']('test.png')).toBe('.png');
-        expect(imageMiddleware['getFileExtension']('test.jpeg')).toBe('.jpeg');
-        expect(imageMiddleware['getFileExtension']('test.jpg')).toBe('.jpg');
-        expect(imageMiddleware['getFileExtension']('test')).toBe('');
-      });
+    it('should return false for invalid image extensions', async () => {
+      await expectAsync(imageMiddleware.isImageValid('image.txt')).toBeResolvedTo(false);
+      await expectAsync(imageMiddleware.isImageValid('image.gif')).toBeResolvedTo(false);
+    });
+  });
+
+  describe('isEndpointValid', () => {
+    it('should return true for valid endpoint', async () => {
+      await expectAsync(imageMiddleware.isEndpointValid('/images/test.png')).toBeResolvedTo(true);
+      await expectAsync(imageMiddleware.isEndpointValid('/images/another-image.jpg')).toBeResolvedTo(true);
     });
 
-    describe('isImageValid', () => {
-      it('should return true for valid image extensions', async () => {
-        await expectAsync(imageMiddleware.isImageValid('image.png')).toBeResolvedTo(true);
-        await expectAsync(imageMiddleware.isImageValid('image.jpeg')).toBeResolvedTo(true);
-        await expectAsync(imageMiddleware.isImageValid('image.jpg')).toBeResolvedTo(true);
-      });
-
-      it('should return false for invalid image extensions', async () => {
-        await expectAsync(imageMiddleware.isImageValid('image.txt')).toBeResolvedTo(false);
-        await expectAsync(imageMiddleware.isImageValid('image.gif')).toBeResolvedTo(false);
-      });
+    it('should return false for invalid endpoint', async () => {
+      await expectAsync(imageMiddleware.isEndpointValid('/not-images/test.png')).toBeResolvedTo(false);
+      await expectAsync(imageMiddleware.isEndpointValid('/other-endpoint')).toBeResolvedTo(false);
     });
+  });
+});
 
-    describe('isEndpointValid', () => {
-      it('should return true for valid endpoint', async () => {
-        await expectAsync(imageMiddleware.isEndpointValid('/images/test.png')).toBeResolvedTo(true);
-        await expectAsync(imageMiddleware.isEndpointValid('/images/another-image.jpg')).toBeResolvedTo(true);
+describe('GET /api/images', () => {
+  it('should return 200 OK for valid image request', (done) => {
+    supertest(app)
+      .get('/api/images?filename=full-stack&width=1000&height=500')
+      .expect(200)
+      .end((err: any, res: Response) => {
+        if (err) throw err;
+        expect(res.status).toBe(200);
+        done();
       });
+  });
 
-      it('should return false for invalid endpoint', async () => {
-        await expectAsync(imageMiddleware.isEndpointValid('/not-images/test.png')).toBeResolvedTo(false);
-        await expectAsync(imageMiddleware.isEndpointValid('/other-endpoint')).toBeResolvedTo(false);
+  it('should return 400 Bad Request for invalid parameters', (done) => {
+    supertest(app)
+      .get('/api/images?filename=invalid-image&width=abc&height=xyz')
+      .expect(400)
+      .end((err: any, res: Response) => {
+        if (err) throw err;
+        expect(res.status).toBe(400);
+        done();
       });
-    });
+  });
 });
